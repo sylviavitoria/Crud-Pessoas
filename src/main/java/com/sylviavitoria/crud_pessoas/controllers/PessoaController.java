@@ -25,4 +25,19 @@ public class PessoaController {
         return ResponseEntity.ok(savedPessoa);
     }
 
+    @GetMapping
+    public ResponseEntity<List<PessoaDTO>> listarTodas() {
+        List<PessoaDTO> pessoas = pessoaService.listarTodas();
+        return ResponseEntity.ok(pessoas);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<PessoaDTO> buscarPorId(@PathVariable Long id) {
+        try {
+            PessoaDTO pessoa = pessoaService.buscarPorId(id);
+            return ResponseEntity.ok(pessoa);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }

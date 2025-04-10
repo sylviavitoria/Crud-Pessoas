@@ -36,6 +36,18 @@ public class PessoaService {
         return new PessoaDTO(pessoa);
     }
 
+    public List<PessoaDTO> listarTodas() {
+        return pessoaRepository.findAll().stream()
+                .map(pessoa -> new PessoaDTO(pessoa))
+                .collect(Collectors.toList());
+    }
+
+    public PessoaDTO buscarPorId(Long id) {
+        Pessoa pessoa = pessoaRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Pessoa não encontrada com o ID: " + id));
+        return new PessoaDTO(pessoa);
+    }
+    
     
     private Pessoa convertToEntity(PessoaDTO dto) {
         Pessoa pessoa;

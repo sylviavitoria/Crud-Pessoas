@@ -40,4 +40,26 @@ public class PessoaController {
             return ResponseEntity.notFound().build();
         }
     }
+    
+    @PutMapping("/{id}")
+    public ResponseEntity<PessoaDTO> atualizar(@PathVariable Long id, @Valid @RequestBody PessoaDTO pessoaDTO) {
+        try {
+            PessoaDTO updatedPessoa = pessoaService.atualizar(id, pessoaDTO);
+            return ResponseEntity.ok(updatedPessoa);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> excluir(@PathVariable Long id) {
+        try {
+            pessoaService.excluir(id);
+            return ResponseEntity.noContent().build();
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }

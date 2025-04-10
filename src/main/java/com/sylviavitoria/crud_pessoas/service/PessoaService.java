@@ -48,7 +48,34 @@ public class PessoaService {
         return new PessoaDTO(pessoa);
     }
     
-    
+    @Transactional
+    public PessoaDTO atualizar(Long id, PessoaDTO pessoaDTO) {
+        if (!pessoaRepository.existsById(id)) {
+            throw new EntityNotFoundException("Pessoa não encontrada com o ID: " + id);
+        }
+        
+        if (pessoaRepository.existsByCpf(pessoaDTO.getCpf())) {
+            Pessoa existingPessoa = pessoaRepository.findById(id)
+                    .orElseThrow(() -> new EntityNotFoundException("Pessoa não encontrada"));
+            if (!existingPessoa.getCpf().equals(pessoaDTO.getCpf())) {
+                throw new IllegalArgumentException("CPF já cadastrado para outra pessoa");
+            }
+        }
+        
+        pessoaDTO.setId(id);
+        Pessoa pessoa = convertToEntity(pessoaDTO);
+        pessoa = pessoaRepository.save(pessoa);
+        return new PessoaDTO(pessoa);
+    }
+
+    @Transactional
+    public void excluir(Long id) {
+        if (!pessoaRepository.existsById(id)) {
+            throw new EntityNotFoundException("Pessoa não encontrada com o ID: " + id);
+        }
+        pessoaRepository.deleteById(id);
+    }
+
     private Pessoa convertToEntity(PessoaDTO dto) {
         Pessoa pessoa;
         

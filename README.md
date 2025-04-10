@@ -7,6 +7,10 @@
 - **Uma Pessoa pode ter vários Endereços**
 - Ao excluir uma Pessoa, todos os seus Endereços devem ser excluídos em cascata
 
+Seguindo o anexo do diagrama:
+![image](https://github.com/user-attachments/assets/fee564bb-f005-481c-8590-a499f52686d7)
+
+
 ## ✅ Funcionalidades
 
 - [x] Listar todas as pessoas e seus respectivos endereços

@@ -1,4 +1,4 @@
-package com.sylviavitoria.crud_pessoas;
+package com.sylviavitoria.crud_pessoas.service;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -21,7 +21,6 @@ import com.sylviavitoria.crud_pessoas.dto.PessoaDTO;
 import com.sylviavitoria.crud_pessoas.model.Endereco;
 import com.sylviavitoria.crud_pessoas.model.Pessoa;
 import com.sylviavitoria.crud_pessoas.repository.PessoaRepository;
-import com.sylviavitoria.crud_pessoas.service.PessoaService;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -43,13 +42,13 @@ public class PessoaServiceTest {
 
     @BeforeEach
     public void configurar() {
-    
+
         pessoa = new Pessoa();
         pessoa.setId(1L);
         pessoa.setNome("João Silva");
         pessoa.setCpf("12345678900");
         pessoa.setDataNascimento("01/01/1990");
-        
+
         endereco = new Endereco();
         endereco.setId(1L);
         endereco.setRua("Rua Teste");
@@ -67,7 +66,7 @@ public class PessoaServiceTest {
         pessoaDTO.setNome("João Silva");
         pessoaDTO.setCpf("12345678900");
         pessoaDTO.setDataNascimento(LocalDate.of(1990, 1, 1));
-        pessoaDTO.setIdade(33); 
+        pessoaDTO.setIdade(33);
         pessoaDTO.setEnderecos(Arrays.asList(enderecoDTO));
 
         listaPessoas = Arrays.asList(pessoa);
@@ -117,13 +116,13 @@ public class PessoaServiceTest {
         novaPessoaDTO.setNome("Maria Oliveira");
         novaPessoaDTO.setCpf("98765432100");
         novaPessoaDTO.setDataNascimento(LocalDate.of(1995, 5, 15));
-        
+
         Pessoa novaPessoa = new Pessoa();
         novaPessoa.setId(2L);
         novaPessoa.setNome("Maria Oliveira");
         novaPessoa.setCpf("98765432100");
         novaPessoa.setDataNascimento("15/05/1995");
-        
+
         when(pessoaRepository.existsByCpf("98765432100")).thenReturn(false);
         when(pessoaRepository.save(any(Pessoa.class))).thenReturn(novaPessoa);
 
@@ -132,7 +131,7 @@ public class PessoaServiceTest {
         assertNotNull(resultado);
         assertEquals("Maria Oliveira", resultado.getNome());
         assertEquals("98765432100", resultado.getCpf());
-        
+
         verify(pessoaRepository, times(1)).existsByCpf("98765432100");
         verify(pessoaRepository, times(1)).save(any(Pessoa.class));
     }
@@ -142,13 +141,13 @@ public class PessoaServiceTest {
         PessoaDTO novaPessoaDTO = new PessoaDTO();
         novaPessoaDTO.setNome("Duplicado");
         novaPessoaDTO.setCpf("12345678900");
-        
+
         when(pessoaRepository.existsByCpf("12345678900")).thenReturn(true);
 
         assertThrows(IllegalArgumentException.class, () -> {
             pessoaService.salvar(novaPessoaDTO);
         });
-        
+
         verify(pessoaRepository, times(1)).existsByCpf("12345678900");
         verify(pessoaRepository, never()).save(any(Pessoa.class));
     }
@@ -158,9 +157,9 @@ public class PessoaServiceTest {
         Long id = 1L;
         PessoaDTO atualizacaoDTO = new PessoaDTO();
         atualizacaoDTO.setNome("João Silva Atualizado");
-        atualizacaoDTO.setCpf("12345678900"); 
+        atualizacaoDTO.setCpf("12345678900");
         atualizacaoDTO.setDataNascimento(LocalDate.of(1990, 1, 1));
-    
+
         when(pessoaRepository.existsById(id)).thenReturn(true);
         when(pessoaRepository.existsByCpf("12345678900")).thenReturn(true);
         when(pessoaRepository.findById(id)).thenReturn(Optional.of(pessoa));
@@ -171,10 +170,10 @@ public class PessoaServiceTest {
         assertNotNull(resultado);
         assertEquals("João Silva Atualizado", resultado.getNome());
         assertEquals("12345678900", resultado.getCpf());
-    
+
         verify(pessoaRepository, times(1)).existsById(id);
         verify(pessoaRepository, times(1)).existsByCpf("12345678900");
-        verify(pessoaRepository, times(2)).findById(id); 
+        verify(pessoaRepository, times(2)).findById(id);
         verify(pessoaRepository, times(1)).save(any(Pessoa.class));
     }
 
@@ -184,13 +183,13 @@ public class PessoaServiceTest {
         PessoaDTO atualizacaoDTO = new PessoaDTO();
         atualizacaoDTO.setNome("Pessoa Inexistente");
         atualizacaoDTO.setCpf("99999999999");
-        
+
         when(pessoaRepository.existsById(id)).thenReturn(false);
 
         assertThrows(IllegalArgumentException.class, () -> {
             pessoaService.atualizar(id, atualizacaoDTO);
         });
-        
+
         verify(pessoaRepository, times(1)).existsById(id);
         verify(pessoaRepository, never()).save(any(Pessoa.class));
     }
@@ -200,16 +199,16 @@ public class PessoaServiceTest {
         Long id = 1L;
         PessoaDTO atualizacaoDTO = new PessoaDTO();
         atualizacaoDTO.setNome("João Silva");
-        atualizacaoDTO.setCpf("98765432100"); 
-        
+        atualizacaoDTO.setCpf("98765432100");
+
         Pessoa outraPessoa = new Pessoa();
         outraPessoa.setId(2L);
         outraPessoa.setCpf("98765432100");
-        
+
         when(pessoaRepository.existsById(id)).thenReturn(true);
         when(pessoaRepository.existsByCpf("98765432100")).thenReturn(true);
         when(pessoaRepository.findById(id)).thenReturn(Optional.of(pessoa));
-        
+
         assertThrows(IllegalArgumentException.class, () -> {
             pessoaService.atualizar(id, atualizacaoDTO);
         });
@@ -240,7 +239,7 @@ public class PessoaServiceTest {
         assertThrows(IllegalArgumentException.class, () -> {
             pessoaService.excluir(id);
         });
-        
+
         verify(pessoaRepository, times(1)).existsById(id);
         verify(pessoaRepository, never()).deleteById(anyLong());
     }
@@ -251,7 +250,7 @@ public class PessoaServiceTest {
         novaPessoaDTO.setNome("Carlos Souza");
         novaPessoaDTO.setCpf("11122233344");
         novaPessoaDTO.setDataNascimento(LocalDate.of(1985, 3, 10));
-        
+
         EnderecoDTO novoEnderecoDTO = new EnderecoDTO();
         novoEnderecoDTO.setRua("Av Principal");
         novoEnderecoDTO.setNumero(456);
@@ -259,15 +258,15 @@ public class PessoaServiceTest {
         novoEnderecoDTO.setCidade("Rio de Janeiro");
         novoEnderecoDTO.setEstado("RJ");
         novoEnderecoDTO.setCep("22222-333");
-        
+
         novaPessoaDTO.setEnderecos(Arrays.asList(novoEnderecoDTO));
-        
+
         Pessoa pessoaSalva = new Pessoa();
         pessoaSalva.setId(3L);
         pessoaSalva.setNome("Carlos Souza");
         pessoaSalva.setCpf("11122233344");
         pessoaSalva.setDataNascimento("10/03/1985");
-        
+
         Endereco enderecoSalvo = new Endereco();
         enderecoSalvo.setId(2L);
         enderecoSalvo.setRua("Av Principal");
@@ -277,7 +276,7 @@ public class PessoaServiceTest {
         enderecoSalvo.setEstado("RJ");
         enderecoSalvo.setCep("22222-333");
         pessoaSalva.addEndereco(enderecoSalvo);
-        
+
         when(pessoaRepository.existsByCpf("11122233344")).thenReturn(false);
         when(pessoaRepository.save(any(Pessoa.class))).thenReturn(pessoaSalva);
 
@@ -290,8 +289,80 @@ public class PessoaServiceTest {
         assertEquals(1, resultado.getEnderecos().size());
         assertEquals("Av Principal", resultado.getEnderecos().get(0).getRua());
         assertEquals("Rio de Janeiro", resultado.getEnderecos().get(0).getCidade());
-        
+
         verify(pessoaRepository, times(1)).existsByCpf("11122233344");
         verify(pessoaRepository, times(1)).save(any(Pessoa.class));
+    }
+
+    @Test
+    public void testarSalvar_AtualizacaoComMesmoCPF() {
+        PessoaDTO atualizacaoPessoaDTO = new PessoaDTO();
+        atualizacaoPessoaDTO.setId(1L);
+        atualizacaoPessoaDTO.setNome("João Silva Atualizado");
+        atualizacaoPessoaDTO.setCpf("12345678900");
+        atualizacaoPessoaDTO.setDataNascimento(LocalDate.of(1990, 1, 1));
+    
+        Pessoa pessoaAtualizada = new Pessoa();
+        pessoaAtualizada.setId(1L);
+        pessoaAtualizada.setNome("João Silva Atualizado");
+        pessoaAtualizada.setCpf("12345678900");
+        pessoaAtualizada.setDataNascimento("01/01/1990");
+    
+        when(pessoaRepository.existsByCpf("12345678900")).thenReturn(true);
+        when(pessoaRepository.findById(1L)).thenReturn(Optional.of(pessoa));
+        when(pessoaRepository.save(any(Pessoa.class))).thenReturn(pessoaAtualizada);
+    
+        PessoaDTO resultado = pessoaService.salvar(atualizacaoPessoaDTO);
+    
+        assertNotNull(resultado);
+        assertEquals("João Silva Atualizado", resultado.getNome());
+        assertEquals("12345678900", resultado.getCpf());
+    
+        verify(pessoaRepository, times(1)).existsByCpf("12345678900");
+        verify(pessoaRepository, times(2)).findById(1L); // Corrigido para verificar 2 chamadas
+        verify(pessoaRepository, times(1)).save(any(Pessoa.class));
+    }
+
+    @Test
+    public void testarSalvar_AtualizacaoComCPFDeDiferentePessoa() {
+        PessoaDTO atualizacaoPessoaDTO = new PessoaDTO();
+        atualizacaoPessoaDTO.setId(1L);
+        atualizacaoPessoaDTO.setNome("João Silva");
+        atualizacaoPessoaDTO.setCpf("98765432100");
+
+        Pessoa pessoaExistente = new Pessoa();
+        pessoaExistente.setId(1L);
+        pessoaExistente.setNome("João Silva");
+        pessoaExistente.setCpf("12345678900");
+
+        when(pessoaRepository.existsByCpf("98765432100")).thenReturn(true);
+        when(pessoaRepository.findById(1L)).thenReturn(Optional.of(pessoaExistente));
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            pessoaService.salvar(atualizacaoPessoaDTO);
+        });
+
+        verify(pessoaRepository, times(1)).existsByCpf("98765432100");
+        verify(pessoaRepository, times(1)).findById(1L);
+        verify(pessoaRepository, never()).save(any(Pessoa.class));
+    }
+
+    @Test
+    public void testarSalvar_IdExistenteMasPessoaNaoEncontrada() {
+        PessoaDTO atualizacaoPessoaDTO = new PessoaDTO();
+        atualizacaoPessoaDTO.setId(99L);
+        atualizacaoPessoaDTO.setNome("Pessoa Inexistente");
+        atualizacaoPessoaDTO.setCpf("12345678900");
+
+        when(pessoaRepository.existsByCpf("12345678900")).thenReturn(true);
+        when(pessoaRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThrows(EntityNotFoundException.class, () -> {
+            pessoaService.salvar(atualizacaoPessoaDTO);
+        });
+
+        verify(pessoaRepository, times(1)).existsByCpf("12345678900");
+        verify(pessoaRepository, times(1)).findById(99L);
+        verify(pessoaRepository, never()).save(any(Pessoa.class));
     }
 }

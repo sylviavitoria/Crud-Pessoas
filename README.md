@@ -38,11 +38,20 @@ Seguindo o anexo do diagrama:
 - Java 21+
 - Spring Boot
 - Spring Data JPA
+- JUnit 5
+- Mockito para mock de dependências
 - H2 Database (em memória)
 - Lombok
 - Maven
 - JSON como formato de troca de dados
 - Postman
+
+---
+### 🧪 Testes
+
+Foram implementados testes para as classes `PessoaController` e `PessoaService`, garantindo aproximadamente **70% de cobertura de código**. 
+
+Os testes validam desde as regras de negócio (como cálculo da idade e validação de CPF único) até as respostas esperadas da API, utilizando **JUnit** e **Mockito**.
 
 ---
 

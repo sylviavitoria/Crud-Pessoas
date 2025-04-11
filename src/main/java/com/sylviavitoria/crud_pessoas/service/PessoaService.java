@@ -44,14 +44,14 @@ public class PessoaService {
 
     public PessoaDTO buscarPorId(Long id) {
         Pessoa pessoa = pessoaRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Pessoa não encontrada com o ID: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("Pessoa não encontrada com o ID: " + id));
         return new PessoaDTO(pessoa);
     }
     
     @Transactional
     public PessoaDTO atualizar(Long id, PessoaDTO pessoaDTO) {
         if (!pessoaRepository.existsById(id)) {
-            throw new EntityNotFoundException("Pessoa não encontrada com o ID: " + id);
+            throw new IllegalArgumentException("Pessoa não encontrada com o ID: " + id);
         }
         
         if (pessoaRepository.existsByCpf(pessoaDTO.getCpf())) {
@@ -71,7 +71,7 @@ public class PessoaService {
     @Transactional
     public void excluir(Long id) {
         if (!pessoaRepository.existsById(id)) {
-            throw new EntityNotFoundException("Pessoa não encontrada com o ID: " + id);
+            throw new IllegalArgumentException("Pessoa não encontrada com o ID: " + id);
         }
         pessoaRepository.deleteById(id);
     }

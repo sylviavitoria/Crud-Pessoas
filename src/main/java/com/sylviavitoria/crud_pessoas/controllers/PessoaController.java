@@ -20,7 +20,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/api/pessoas")
+@RequestMapping("/api/v1/pessoas")
 @Tag(name = "Pessoas", description = "API para gerenciamento de pessoas")
 public class PessoaController {
 

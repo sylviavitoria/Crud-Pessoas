@@ -55,7 +55,7 @@ public class PessoaControllerTest {
     public void testListarTodas() throws Exception {
         when(pessoaService.listarTodas()).thenReturn(pessoas);
 
-        mockMvc.perform(get("/api/pessoas")
+        mockMvc.perform(get("/api/v1/pessoas")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
@@ -64,7 +64,7 @@ public class PessoaControllerTest {
     public void testBuscarPorId_Sucesso() throws Exception {
         when(pessoaService.buscarPorId(1L)).thenReturn(pessoaDTO);
 
-        mockMvc.perform(get("/api/pessoas/1")
+        mockMvc.perform(get("/api/v1/pessoas/1")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
@@ -73,7 +73,7 @@ public class PessoaControllerTest {
     public void testBuscarPorId_NaoEncontrado() throws Exception {
         when(pessoaService.buscarPorId(99L)).thenThrow(new EntityNotFoundException());
 
-        mockMvc.perform(get("/api/pessoas/99")
+        mockMvc.perform(get("/api/v1/pessoas/99")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
@@ -87,7 +87,7 @@ public class PessoaControllerTest {
 
         when(pessoaService.salvar(any(PessoaDTO.class))).thenReturn(novaPessoa);
 
-        mockMvc.perform(post("/api/pessoas")
+        mockMvc.perform(post("/api/v1/pessoas")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(novaPessoa)))
                 .andExpect(status().isCreated());
@@ -101,7 +101,7 @@ public class PessoaControllerTest {
         
         when(pessoaService.atualizar(eq(1L), any(PessoaDTO.class))).thenReturn(pessoaAtualizada);
 
-        mockMvc.perform(put("/api/pessoas/1")
+        mockMvc.perform(put("/api/v1/pessoas/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(pessoaAtualizada)))
                 .andExpect(status().isOk());
@@ -116,7 +116,7 @@ public class PessoaControllerTest {
         
         when(pessoaService.atualizar(eq(99L), any(PessoaDTO.class))).thenThrow(new EntityNotFoundException());
 
-        mockMvc.perform(put("/api/pessoas/99")
+        mockMvc.perform(put("/api/v1/pessoas/99")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(pessoaAtualizada)))
                 .andExpect(status().isNotFound());
@@ -131,7 +131,7 @@ public class PessoaControllerTest {
         
         when(pessoaService.atualizar(eq(1L), any(PessoaDTO.class))).thenThrow(new IllegalArgumentException("CPF já cadastrado"));
 
-        mockMvc.perform(put("/api/pessoas/1")
+        mockMvc.perform(put("/api/v1/pessoas/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(pessoaAtualizada)))
                 .andExpect(status().isBadRequest());
@@ -141,7 +141,7 @@ public class PessoaControllerTest {
     public void testExcluir_Sucesso() throws Exception {
         doNothing().when(pessoaService).excluir(1L);
 
-        mockMvc.perform(delete("/api/pessoas/1"))
+        mockMvc.perform(delete("/api/v1/pessoas/1"))
                 .andExpect(status().isNoContent());
     }
     
@@ -149,7 +149,7 @@ public class PessoaControllerTest {
     public void testExcluir_NaoEncontrado() throws Exception {
         doThrow(new EntityNotFoundException()).when(pessoaService).excluir(99L);
 
-        mockMvc.perform(delete("/api/pessoas/99"))
+        mockMvc.perform(delete("/api/v1/pessoas/99"))
                 .andExpect(status().isNotFound());
     }
 }

@@ -319,7 +319,7 @@ public class PessoaServiceTest {
         assertEquals("12345678900", resultado.getCpf());
     
         verify(pessoaRepository, times(1)).existsByCpf("12345678900");
-        verify(pessoaRepository, times(2)).findById(1L); // Corrigido para verificar 2 chamadas
+        verify(pessoaRepository, times(2)).findById(1L);
         verify(pessoaRepository, times(1)).save(any(Pessoa.class));
     }
 

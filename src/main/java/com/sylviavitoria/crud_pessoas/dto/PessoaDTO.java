@@ -8,14 +8,29 @@ import java.util.stream.Collectors;
 
 import com.sylviavitoria.crud_pessoas.model.Pessoa;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Schema(description = "Dados de uma pessoa")
 public class PessoaDTO {
+    @Schema(description = "Identificador único da pessoa", example = "1", accessMode = Schema.AccessMode.READ_ONLY)
     private Long id;
+    
+    @Schema(description = "Nome completo da pessoa", example = "Joao da Silva", required = true)
     private String nome;
+    
+    @Schema(description = "Data de nascimento no formato ISO", example = "1990-01-01", required = true)
     private LocalDate dataNascimento;
+    
+    @Schema(description = "CPF da pessoa (somente números ou formatado)", example = "170.950.450-00", required = true)
     private String cpf;
+    
+    @Schema(description = "Lista de endereços associados à pessoa")
     private List<EnderecoDTO> enderecos = new ArrayList<>();
+    
+    @Schema(description = "Idade calculada a partir da data de nascimento", example = "00", accessMode = Schema.AccessMode.READ_ONLY)
     private Integer idade;
     
+
     public PessoaDTO() {
     }
     

@@ -35,3 +35,8 @@ build/
 # Docker
 docker-compose.override.yml
 *.log
+
+### Arquivos de configuração com credenciais sensíveis ###
+.env
+*.env
+.env.*

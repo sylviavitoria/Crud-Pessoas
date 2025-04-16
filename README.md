@@ -47,6 +47,32 @@ Seguindo o anexo do diagrama:
 - Postman
 
 ---
+## 📖 Documentação da API com Swagger (OpenAPI)
+
+Este projeto utiliza o **Swagger** (através do Springdoc OpenAPI) para gerar automaticamente a documentação interativa da API REST.
+
+### O que é Swagger?
+
+O **Swagger** é uma ferramenta que permite documentar, visualizar e testar endpoints de APIs REST de forma interativa, facilitando o entendimento e o uso da API por desenvolvedores e integradores.
+
+### Como acessar a documentação Swagger
+
+Após iniciar a aplicação, acesse no navegador:
+
+- **Swagger UI:**  
+  [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
+
+- **OpenAPI JSON:**  
+  [http://localhost:8080/api-docs](http://localhost:8080/api-docs)
+
+### Recursos disponíveis
+
+- Visualização de todos os endpoints da API, métodos suportados, parâmetros, exemplos de requisição e resposta.
+- Possibilidade de testar os endpoints diretamente pela interface web, enviando dados e visualizando as respostas.
+- Descrições detalhadas dos campos dos modelos (`PessoaDTO`, `EnderecoDTO`), exemplos de payload e mensagens de erro.
+
+
+---
 ### 🧪 Testes
 
 Foram implementados testes para as classes `PessoaController` e `PessoaService`, garantindo aproximadamente **70% de cobertura de código**. 

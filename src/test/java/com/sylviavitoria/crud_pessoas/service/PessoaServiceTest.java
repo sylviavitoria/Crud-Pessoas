@@ -88,25 +88,27 @@ public class PessoaServiceTest {
 
     @Test
     public void testarBuscarPorId_IdExistente() {
+        // Arrange
         when(pessoaRepository.findById(1L)).thenReturn(Optional.of(pessoa));
-
+        // Act
         PessoaDTO resultado = pessoaService.buscarPorId(1L);
-
+        // Assert
         assertNotNull(resultado);
         assertEquals("João Silva", resultado.getNome());
         assertEquals("12345678900", resultado.getCpf());
-
+        // Assert 
         verify(pessoaRepository, times(1)).findById(1L);
     }
 
     @Test
     public void testarBuscarPorId_IdInexistente() {
+        // Arrange
         when(pessoaRepository.findById(99L)).thenReturn(Optional.empty());
-
-        assertThrows(IllegalArgumentException.class, () -> {
+        // Act + Assert
+        assertThrows(EntityNotFoundException.class, () -> {
             pessoaService.buscarPorId(99L);
         });
-
+        // Assert 
         verify(pessoaRepository, times(1)).findById(99L);
     }
 
@@ -301,23 +303,23 @@ public class PessoaServiceTest {
         atualizacaoPessoaDTO.setNome("João Silva Atualizado");
         atualizacaoPessoaDTO.setCpf("12345678900");
         atualizacaoPessoaDTO.setDataNascimento(LocalDate.of(1990, 1, 1));
-    
+
         Pessoa pessoaAtualizada = new Pessoa();
         pessoaAtualizada.setId(1L);
         pessoaAtualizada.setNome("João Silva Atualizado");
         pessoaAtualizada.setCpf("12345678900");
         pessoaAtualizada.setDataNascimento("01/01/1990");
-    
+
         when(pessoaRepository.existsByCpf("12345678900")).thenReturn(true);
         when(pessoaRepository.findById(1L)).thenReturn(Optional.of(pessoa));
         when(pessoaRepository.save(any(Pessoa.class))).thenReturn(pessoaAtualizada);
-    
+
         PessoaDTO resultado = pessoaService.salvar(atualizacaoPessoaDTO);
-    
+
         assertNotNull(resultado);
         assertEquals("João Silva Atualizado", resultado.getNome());
         assertEquals("12345678900", resultado.getCpf());
-    
+
         verify(pessoaRepository, times(1)).existsByCpf("12345678900");
         verify(pessoaRepository, times(2)).findById(1L);
         verify(pessoaRepository, times(1)).save(any(Pessoa.class));

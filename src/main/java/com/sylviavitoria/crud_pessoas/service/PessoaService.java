@@ -30,7 +30,7 @@ public class PessoaService {
         } else if (pessoaDTO.getId() == null && pessoaRepository.existsByCpf(pessoaDTO.getCpf())) {
             throw new IllegalArgumentException("CPF já cadastrado");
         }
-        
+
         Pessoa pessoa = convertToEntity(pessoaDTO);
         pessoa = pessoaRepository.save(pessoa);
         return new PessoaDTO(pessoa);
@@ -44,16 +44,16 @@ public class PessoaService {
 
     public PessoaDTO buscarPorId(Long id) {
         Pessoa pessoa = pessoaRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Pessoa não encontrada com o ID: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Pessoa não encontrada com o ID: " + id));
         return new PessoaDTO(pessoa);
     }
-    
+
     @Transactional
     public PessoaDTO atualizar(Long id, PessoaDTO pessoaDTO) {
         if (!pessoaRepository.existsById(id)) {
             throw new IllegalArgumentException("Pessoa não encontrada com o ID: " + id);
         }
-        
+
         if (pessoaRepository.existsByCpf(pessoaDTO.getCpf())) {
             Pessoa existingPessoa = pessoaRepository.findById(id)
                     .orElseThrow(() -> new EntityNotFoundException("Pessoa não encontrada"));
@@ -61,7 +61,7 @@ public class PessoaService {
                 throw new IllegalArgumentException("CPF já cadastrado para outra pessoa");
             }
         }
-        
+
         pessoaDTO.setId(id);
         Pessoa pessoa = convertToEntity(pessoaDTO);
         pessoa = pessoaRepository.save(pessoa);
@@ -78,31 +78,32 @@ public class PessoaService {
 
     private Pessoa convertToEntity(PessoaDTO dto) {
         Pessoa pessoa;
-        
+
         if (dto.getId() != null) {
             pessoa = pessoaRepository.findById(dto.getId())
-                .orElse(new Pessoa());
+                    .orElse(new Pessoa());
         } else {
             pessoa = new Pessoa();
         }
-        
+
         pessoa.setId(dto.getId());
         pessoa.setNome(dto.getNome());
         pessoa.setCpf(dto.getCpf());
-        
+
         if (dto.getDataNascimento() != null) {
-            pessoa.setDataNascimento(dto.getDataNascimento().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+            pessoa.setDataNascimento(
+                    dto.getDataNascimento().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")));
         }
-        
+
         pessoa.getEnderecos().clear();
-        
+
         if (dto.getEnderecos() != null) {
             dto.getEnderecos().forEach(enderecoDTO -> {
                 Endereco endereco = enderecoDTO.toEntity();
                 pessoa.addEndereco(endereco);
             });
         }
-        
+
         return pessoa;
     }
 }

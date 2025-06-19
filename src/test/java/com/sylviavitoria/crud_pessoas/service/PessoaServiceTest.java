@@ -1,7 +1,6 @@
 package com.sylviavitoria.crud_pessoas.service;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
@@ -13,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -26,7 +26,7 @@ import com.sylviavitoria.crud_pessoas.repository.PessoaRepository;
 import jakarta.persistence.EntityNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
-public class PessoaServiceTest {
+class PessoaServiceTest {
 
     @Mock
     private PessoaRepository pessoaRepository;
@@ -41,7 +41,7 @@ public class PessoaServiceTest {
     private EnderecoDTO enderecoDTO;
 
     @BeforeEach
-    public void configurar() {
+    void configurar() {
         pessoa = new Pessoa();
         pessoa.setId(1L);
         pessoa.setNome("João Silva");
@@ -73,7 +73,7 @@ public class PessoaServiceTest {
 
     @Test
     @DisplayName("Deve listar todas as pessoas cadastradas")
-    public void testarListarTodas() {
+    void testarListarTodas() {
         when(pessoaRepository.findAll()).thenReturn(listaPessoas);
 
         List<PessoaDTO> resultado = pessoaService.listarTodas();
@@ -88,7 +88,7 @@ public class PessoaServiceTest {
 
     @Test
     @DisplayName("Deve buscar pessoa por ID quando o ID existe")
-    public void testarBuscarPorId_IdExistente() {
+    void testarBuscarPorId_IdExistente() {
         // Arrange
         when(pessoaRepository.findById(1L)).thenReturn(Optional.of(pessoa));
         // Act
@@ -103,7 +103,7 @@ public class PessoaServiceTest {
 
     @Test
     @DisplayName("Deve lançar EntityNotFoundException ao buscar pessoa com ID inexistente")
-    public void testarBuscarPorId_IdInexistente() {
+    void testarBuscarPorId_IdInexistente() {
         // Arrange
         when(pessoaRepository.findById(99L)).thenReturn(Optional.empty());
         // Act + Assert
@@ -116,7 +116,8 @@ public class PessoaServiceTest {
 
     @Test
     @DisplayName("Deve salvar uma nova pessoa com sucesso")
-    public void testarSalvar_NovaPessoa() {
+    void testarSalvar_NovaPessoa() {
+
         PessoaDTO novaPessoaDTO = new PessoaDTO();
         novaPessoaDTO.setNome("Maria Oliveira");
         novaPessoaDTO.setCpf("98765432100");
@@ -128,8 +129,10 @@ public class PessoaServiceTest {
         novaPessoa.setCpf("98765432100");
         novaPessoa.setDataNascimento("15/05/1995");
 
+        ArgumentCaptor<Pessoa> pessoaCaptor = ArgumentCaptor.forClass(Pessoa.class);
+        
         when(pessoaRepository.existsByCpf("98765432100")).thenReturn(false);
-        when(pessoaRepository.save(any(Pessoa.class))).thenReturn(novaPessoa);
+        when(pessoaRepository.save(pessoaCaptor.capture())).thenReturn(novaPessoa);
 
         PessoaDTO resultado = pessoaService.salvar(novaPessoaDTO);
 
@@ -138,12 +141,17 @@ public class PessoaServiceTest {
         assertEquals("98765432100", resultado.getCpf());
 
         verify(pessoaRepository, times(1)).existsByCpf("98765432100");
-        verify(pessoaRepository, times(1)).save(any(Pessoa.class));
+        verify(pessoaRepository, times(1)).save(pessoaCaptor.getValue());
+        
+        Pessoa pessoaSalva = pessoaCaptor.getValue();
+        assertEquals("Maria Oliveira", pessoaSalva.getNome());
+        assertEquals("98765432100", pessoaSalva.getCpf());
+        assertEquals("15/05/1995", pessoaSalva.getDataNascimento());
     }
 
     @Test
     @DisplayName("Deve lançar IllegalArgumentException ao tentar salvar pessoa com CPF já existente")
-    public void testarSalvar_CPFExistente() {
+    void testarSalvar_CPFExistente() {
         PessoaDTO novaPessoaDTO = new PessoaDTO();
         novaPessoaDTO.setNome("Duplicado");
         novaPessoaDTO.setCpf("12345678900");
@@ -160,17 +168,20 @@ public class PessoaServiceTest {
 
     @Test
     @DisplayName("Deve atualizar pessoa com ID existente")
-    public void testarAtualizar_IdExistente() {
+    void testarAtualizar_IdExistente() {
+
         Long id = 1L;
         PessoaDTO atualizacaoDTO = new PessoaDTO();
         atualizacaoDTO.setNome("João Silva Atualizado");
         atualizacaoDTO.setCpf("12345678900");
         atualizacaoDTO.setDataNascimento(LocalDate.of(1990, 1, 1));
 
+        ArgumentCaptor<Pessoa> pessoaCaptor = ArgumentCaptor.forClass(Pessoa.class);
+
         when(pessoaRepository.existsById(id)).thenReturn(true);
         when(pessoaRepository.existsByCpf("12345678900")).thenReturn(true);
         when(pessoaRepository.findById(id)).thenReturn(Optional.of(pessoa));
-        when(pessoaRepository.save(any(Pessoa.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(pessoaRepository.save(pessoaCaptor.capture())).thenAnswer(invocation -> invocation.getArgument(0));
 
         PessoaDTO resultado = pessoaService.atualizar(id, atualizacaoDTO);
 
@@ -181,12 +192,17 @@ public class PessoaServiceTest {
         verify(pessoaRepository, times(1)).existsById(id);
         verify(pessoaRepository, times(1)).existsByCpf("12345678900");
         verify(pessoaRepository, times(2)).findById(id);
-        verify(pessoaRepository, times(1)).save(any(Pessoa.class));
+        verify(pessoaRepository, times(1)).save(pessoaCaptor.getValue());
+        
+        Pessoa pessoaAtualizada = pessoaCaptor.getValue();
+        assertEquals(1L, pessoaAtualizada.getId());
+        assertEquals("João Silva Atualizado", pessoaAtualizada.getNome());
+        assertEquals("12345678900", pessoaAtualizada.getCpf());
     }
 
     @Test
     @DisplayName("Deve lançar IllegalArgumentException ao atualizar pessoa com ID inexistente")
-    public void testarAtualizar_IdInexistente() {
+    void testarAtualizar_IdInexistente() {
         Long id = 99L;
         PessoaDTO atualizacaoDTO = new PessoaDTO();
         atualizacaoDTO.setNome("Pessoa Inexistente");
@@ -204,7 +220,7 @@ public class PessoaServiceTest {
 
     @Test
     @DisplayName("Deve lançar IllegalArgumentException ao tentar atualizar pessoa com CPF duplicado")
-    public void testarAtualizar_CPFDuplicado() {
+    void testarAtualizar_CPFDuplicado() {
         Long id = 1L;
         PessoaDTO atualizacaoDTO = new PessoaDTO();
         atualizacaoDTO.setNome("João Silva");
@@ -230,7 +246,7 @@ public class PessoaServiceTest {
 
     @Test
     @DisplayName("Deve excluir pessoa com ID existente")
-    public void testarExcluir_IdExistente() {
+    void testarExcluir_IdExistente() {
         Long id = 1L;
         when(pessoaRepository.existsById(id)).thenReturn(true);
         doNothing().when(pessoaRepository).deleteById(id);
@@ -243,7 +259,7 @@ public class PessoaServiceTest {
 
     @Test
     @DisplayName("Deve lançar IllegalArgumentException ao excluir pessoa com ID inexistente")
-    public void testarExcluir_IdInexistente() {
+    void testarExcluir_IdInexistente() {
         Long id = 99L;
         when(pessoaRepository.existsById(id)).thenReturn(false);
 
@@ -257,7 +273,8 @@ public class PessoaServiceTest {
 
     @Test
     @DisplayName("Deve salvar pessoa com seus endereços")
-    public void testarSalvarComEnderecos() {
+    void testarSalvarComEnderecos() {
+        
         PessoaDTO novaPessoaDTO = new PessoaDTO();
         novaPessoaDTO.setNome("Carlos Souza");
         novaPessoaDTO.setCpf("11122233344");
@@ -289,8 +306,10 @@ public class PessoaServiceTest {
         enderecoSalvo.setCep("22222-333");
         pessoaSalva.addEndereco(enderecoSalvo);
 
+        ArgumentCaptor<Pessoa> pessoaCaptor = ArgumentCaptor.forClass(Pessoa.class);
+        
         when(pessoaRepository.existsByCpf("11122233344")).thenReturn(false);
-        when(pessoaRepository.save(any(Pessoa.class))).thenReturn(pessoaSalva);
+        when(pessoaRepository.save(pessoaCaptor.capture())).thenReturn(pessoaSalva);
 
         PessoaDTO resultado = pessoaService.salvar(novaPessoaDTO);
 
@@ -303,12 +322,18 @@ public class PessoaServiceTest {
         assertEquals("Rio de Janeiro", resultado.getEnderecos().get(0).getCidade());
 
         verify(pessoaRepository, times(1)).existsByCpf("11122233344");
-        verify(pessoaRepository, times(1)).save(any(Pessoa.class));
+        verify(pessoaRepository, times(1)).save(pessoaCaptor.getValue());
+        
+        Pessoa pessoaCaptada = pessoaCaptor.getValue();
+        assertEquals("Carlos Souza", pessoaCaptada.getNome());
+        assertEquals("11122233344", pessoaCaptada.getCpf());
+        assertEquals(1, pessoaCaptada.getEnderecos().size());
     }
 
     @Test
     @DisplayName("Deve atualizar pessoa existente mantendo o mesmo CPF")
-    public void testarSalvar_AtualizacaoComMesmoCPF() {
+    void testarSalvar_AtualizacaoComMesmoCPF() {
+
         PessoaDTO atualizacaoPessoaDTO = new PessoaDTO();
         atualizacaoPessoaDTO.setId(1L);
         atualizacaoPessoaDTO.setNome("João Silva Atualizado");
@@ -321,9 +346,11 @@ public class PessoaServiceTest {
         pessoaAtualizada.setCpf("12345678900");
         pessoaAtualizada.setDataNascimento("01/01/1990");
 
+        ArgumentCaptor<Pessoa> pessoaCaptor = ArgumentCaptor.forClass(Pessoa.class);
+        
         when(pessoaRepository.existsByCpf("12345678900")).thenReturn(true);
         when(pessoaRepository.findById(1L)).thenReturn(Optional.of(pessoa));
-        when(pessoaRepository.save(any(Pessoa.class))).thenReturn(pessoaAtualizada);
+        when(pessoaRepository.save(pessoaCaptor.capture())).thenReturn(pessoaAtualizada);
 
         PessoaDTO resultado = pessoaService.salvar(atualizacaoPessoaDTO);
 
@@ -333,12 +360,16 @@ public class PessoaServiceTest {
 
         verify(pessoaRepository, times(1)).existsByCpf("12345678900");
         verify(pessoaRepository, times(2)).findById(1L);
-        verify(pessoaRepository, times(1)).save(any(Pessoa.class));
+        verify(pessoaRepository, times(1)).save(pessoaCaptor.getValue());
+        
+        Pessoa pessoaCaptada = pessoaCaptor.getValue();
+        assertEquals(1L, pessoaCaptada.getId());
+        assertEquals("João Silva Atualizado", pessoaCaptada.getNome());
     }
 
     @Test
     @DisplayName("Deve lançar IllegalArgumentException ao tentar atualizar com CPF de outra pessoa")
-    public void testarSalvar_AtualizacaoComCPFDeDiferentePessoa() {
+    void testarSalvar_AtualizacaoComCPFDeDiferentePessoa() {
         PessoaDTO atualizacaoPessoaDTO = new PessoaDTO();
         atualizacaoPessoaDTO.setId(1L);
         atualizacaoPessoaDTO.setNome("João Silva");
@@ -363,7 +394,7 @@ public class PessoaServiceTest {
 
     @Test
     @DisplayName("Deve lançar EntityNotFoundException ao tentar salvar com ID existente mas pessoa não encontrada")
-    public void testarSalvar_IdExistenteMasPessoaNaoEncontrada() {
+    void testarSalvar_IdExistenteMasPessoaNaoEncontrada() {
         PessoaDTO atualizacaoPessoaDTO = new PessoaDTO();
         atualizacaoPessoaDTO.setId(99L);
         atualizacaoPessoaDTO.setNome("Pessoa Inexistente");

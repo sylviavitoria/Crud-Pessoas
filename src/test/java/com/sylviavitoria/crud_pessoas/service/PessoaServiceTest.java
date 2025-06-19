@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -36,13 +37,11 @@ public class PessoaServiceTest {
     private Pessoa pessoa;
     private PessoaDTO pessoaDTO;
     private List<Pessoa> listaPessoas;
-    private List<PessoaDTO> listaPessoasDTO;
     private Endereco endereco;
     private EnderecoDTO enderecoDTO;
 
     @BeforeEach
     public void configurar() {
-
         pessoa = new Pessoa();
         pessoa.setId(1L);
         pessoa.setNome("João Silva");
@@ -73,6 +72,7 @@ public class PessoaServiceTest {
     }
 
     @Test
+    @DisplayName("Deve listar todas as pessoas cadastradas")
     public void testarListarTodas() {
         when(pessoaRepository.findAll()).thenReturn(listaPessoas);
 
@@ -87,6 +87,7 @@ public class PessoaServiceTest {
     }
 
     @Test
+    @DisplayName("Deve buscar pessoa por ID quando o ID existe")
     public void testarBuscarPorId_IdExistente() {
         // Arrange
         when(pessoaRepository.findById(1L)).thenReturn(Optional.of(pessoa));
@@ -101,6 +102,7 @@ public class PessoaServiceTest {
     }
 
     @Test
+    @DisplayName("Deve lançar EntityNotFoundException ao buscar pessoa com ID inexistente")
     public void testarBuscarPorId_IdInexistente() {
         // Arrange
         when(pessoaRepository.findById(99L)).thenReturn(Optional.empty());
@@ -113,6 +115,7 @@ public class PessoaServiceTest {
     }
 
     @Test
+    @DisplayName("Deve salvar uma nova pessoa com sucesso")
     public void testarSalvar_NovaPessoa() {
         PessoaDTO novaPessoaDTO = new PessoaDTO();
         novaPessoaDTO.setNome("Maria Oliveira");
@@ -139,6 +142,7 @@ public class PessoaServiceTest {
     }
 
     @Test
+    @DisplayName("Deve lançar IllegalArgumentException ao tentar salvar pessoa com CPF já existente")
     public void testarSalvar_CPFExistente() {
         PessoaDTO novaPessoaDTO = new PessoaDTO();
         novaPessoaDTO.setNome("Duplicado");
@@ -155,6 +159,7 @@ public class PessoaServiceTest {
     }
 
     @Test
+    @DisplayName("Deve atualizar pessoa com ID existente")
     public void testarAtualizar_IdExistente() {
         Long id = 1L;
         PessoaDTO atualizacaoDTO = new PessoaDTO();
@@ -180,6 +185,7 @@ public class PessoaServiceTest {
     }
 
     @Test
+    @DisplayName("Deve lançar IllegalArgumentException ao atualizar pessoa com ID inexistente")
     public void testarAtualizar_IdInexistente() {
         Long id = 99L;
         PessoaDTO atualizacaoDTO = new PessoaDTO();
@@ -197,6 +203,7 @@ public class PessoaServiceTest {
     }
 
     @Test
+    @DisplayName("Deve lançar IllegalArgumentException ao tentar atualizar pessoa com CPF duplicado")
     public void testarAtualizar_CPFDuplicado() {
         Long id = 1L;
         PessoaDTO atualizacaoDTO = new PessoaDTO();
@@ -222,6 +229,7 @@ public class PessoaServiceTest {
     }
 
     @Test
+    @DisplayName("Deve excluir pessoa com ID existente")
     public void testarExcluir_IdExistente() {
         Long id = 1L;
         when(pessoaRepository.existsById(id)).thenReturn(true);
@@ -234,6 +242,7 @@ public class PessoaServiceTest {
     }
 
     @Test
+    @DisplayName("Deve lançar IllegalArgumentException ao excluir pessoa com ID inexistente")
     public void testarExcluir_IdInexistente() {
         Long id = 99L;
         when(pessoaRepository.existsById(id)).thenReturn(false);
@@ -247,6 +256,7 @@ public class PessoaServiceTest {
     }
 
     @Test
+    @DisplayName("Deve salvar pessoa com seus endereços")
     public void testarSalvarComEnderecos() {
         PessoaDTO novaPessoaDTO = new PessoaDTO();
         novaPessoaDTO.setNome("Carlos Souza");
@@ -297,6 +307,7 @@ public class PessoaServiceTest {
     }
 
     @Test
+    @DisplayName("Deve atualizar pessoa existente mantendo o mesmo CPF")
     public void testarSalvar_AtualizacaoComMesmoCPF() {
         PessoaDTO atualizacaoPessoaDTO = new PessoaDTO();
         atualizacaoPessoaDTO.setId(1L);
@@ -326,6 +337,7 @@ public class PessoaServiceTest {
     }
 
     @Test
+    @DisplayName("Deve lançar IllegalArgumentException ao tentar atualizar com CPF de outra pessoa")
     public void testarSalvar_AtualizacaoComCPFDeDiferentePessoa() {
         PessoaDTO atualizacaoPessoaDTO = new PessoaDTO();
         atualizacaoPessoaDTO.setId(1L);
@@ -350,6 +362,7 @@ public class PessoaServiceTest {
     }
 
     @Test
+    @DisplayName("Deve lançar EntityNotFoundException ao tentar salvar com ID existente mas pessoa não encontrada")
     public void testarSalvar_IdExistenteMasPessoaNaoEncontrada() {
         PessoaDTO atualizacaoPessoaDTO = new PessoaDTO();
         atualizacaoPessoaDTO.setId(99L);
